@@ -260,9 +260,13 @@ export default function HomePage() {
           }}
         >
           {[
-            { label: "Location", value: "Blue Area, Islamabad" },
-            { label: "Hours", value: "12pm – 12am Daily" },
-            { label: "Reservations", value: "+92 300 0000000" },
+            {
+              label: "Location",
+              value:
+                "B 159 Johar Hill Road, Niaz Siddiqui St, Karachi, 75300, Pakistan",
+            },
+            { label: "Hours", value: "12pm – 3am Daily" },
+            { label: "Reservations", value: "+92 3111147647" },
           ].map(({ label, value }) => (
             <div key={label}>
               <p

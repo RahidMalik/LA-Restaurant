@@ -29,20 +29,20 @@ export default function LoginPage() {
       setError("Invalid credentials. Try again.");
       setIsLoading(false);
     } else {
-      router.push("/admin");
+      router.push("/");
     }
   };
 
   // 2. Handle Google Login
   const handleGoogleLogin = () => {
-    signIn("google", { callbackUrl: "/" }); // Login ke baad home page ya dashboard par bhej dega
+    signIn("google", { callbackUrl: "/" });
   };
 
   return (
     <div style={containerStyle}>
       <div style={glassCardStyle}>
         <h1 style={titleStyle}>
-          Maison <em style={{ color: "var(--gold)" }}>Noir</em>
+          LA <em style={{ color: "var(--gold)" }}>Restaurant</em>
         </h1>
         <p style={subtitleStyle}>Sign in to your account</p>
 

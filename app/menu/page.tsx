@@ -104,16 +104,29 @@ export default function MenuPage() {
   const [search, setSearch] = useState("");
 
   useEffect(() => {
+    // Menu Items Fetch
     getAllMenuItems()
-      .then(setItems)
+      .then((data) => {
+        if (data && data.length > 0) {
+          setItems(data);
+        } else {
+          setItems(DEMO_ITEMS);
+        }
+      })
       .catch(() => setItems(DEMO_ITEMS));
+
+    // Categories Fetch
     getCategories()
-      .then((cats) =>
-        setCategories([
-          { id: "all", name: "All Items", slug: "all", icon: "✦" },
-          ...cats,
-        ]),
-      )
+      .then((cats) => {
+        if (cats && cats.length > 0) {
+          setCategories([
+            { id: "all", name: "All Items", slug: "all", icon: "✦" },
+            ...cats,
+          ]);
+        } else {
+          setCategories(DEMO_CATEGORIES);
+        }
+      })
       .catch(() => setCategories(DEMO_CATEGORIES));
   }, []);
 
