@@ -18,8 +18,8 @@ const handler = NextAuth({
                 password: { label: "Password", type: "password" }
             },
             async authorize(credentials) {
-                const ADMIN_EMAIL = "malikrahid011@gmail.com";
-                const ADMIN_PASSWORD = "12345678";
+                const ADMIN_EMAIL = process.env.ADMIN_EMAIL
+                const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD
 
                 if (
                     credentials?.email === ADMIN_EMAIL &&

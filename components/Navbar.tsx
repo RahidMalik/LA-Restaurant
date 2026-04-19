@@ -66,7 +66,7 @@ export default function Navbar() {
               letterSpacing: "0.12em",
             }}
           >
-            LA - Restaurant
+            Lounge & Restaurant
           </span>
         </Link>
 

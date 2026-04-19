@@ -94,9 +94,11 @@ export default function HomePage() {
             marginBottom: "1.5rem",
           }}
         >
-          Maison
+          Lounge &amp;
           <br />
-          <em style={{ color: "var(--gold)", fontStyle: "italic" }}>Noir</em>
+          <em style={{ color: "var(--gold)", fontStyle: "italic" }}>
+            Restaurant
+          </em>
         </h1>
 
         <p
@@ -165,10 +167,10 @@ export default function HomePage() {
         </div>
 
         {/* Scroll hint */}
-        <div
+        {/* <div
           style={{
             position: "absolute",
-            bottom: "2.5rem",
+            bottom: "0px",
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
@@ -193,7 +195,7 @@ export default function HomePage() {
                 "linear-gradient(to bottom, var(--gold-dim), transparent)",
             }}
           />
-        </div>
+        </div> */}
       </section>
 
       {/* Featured */}
@@ -291,7 +293,7 @@ export default function HomePage() {
             letterSpacing: "0.1em",
           }}
         >
-          © 2024 Maison Noir. All rights reserved.
+          © 2026 LA-Restaurant. All rights reserved.
         </p>
       </footer>
     </>

@@ -135,7 +135,7 @@ export default function AdminPage() {
                 marginTop: "0.3rem",
               }}
             >
-              Maison Noir
+              LA - Restaurant
             </p>
           </div>
 
@@ -192,7 +192,7 @@ export default function AdminPage() {
             color: "var(--gold)",
           }}
         >
-          MAISON NOIR — Admin
+          LA - Restaurant — Admin
         </span>
         <button
           onClick={() => signOut()}

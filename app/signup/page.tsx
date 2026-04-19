@@ -82,7 +82,7 @@ export default function SignUpPage() {
               value={formData.name}
               onChange={handleChange}
               style={inputStyle}
-              placeholder="Malik Rahid"
+              placeholder="Your name"
               required
             />
           </div>
@@ -95,7 +95,7 @@ export default function SignUpPage() {
               value={formData.email}
               onChange={handleChange}
               style={inputStyle}
-              placeholder="name@example.com"
+              placeholder="Email your email"
               required
             />
           </div>
