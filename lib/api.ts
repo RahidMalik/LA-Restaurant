@@ -248,3 +248,22 @@ export async function getAdminSession() {
   const { data } = await supabase.auth.getSession();
   return data.session;
 }
+
+// ─────────────────────────────────────────────
+//  DATABASE CONNECTION TEST
+// ─────────────────────────────────────────────
+
+/** Test database connection */
+export async function testDatabaseConnection() {
+  const { data, error } = await supabase
+    .from("menu_items")
+    .select("*")
+    .limit(5);
+
+  return {
+    success: !error,
+    error: error ? { message: error.message, code: error.code, details: error.details } : null,
+    itemCount: data?.length || 0,
+    data: data || [],
+  };
+}
