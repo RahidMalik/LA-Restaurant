@@ -1,206 +1,121 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Menu, X } from "lucide-react";
 import { useSession, signOut } from "next-auth/react";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
 
-  // Your specific admin email check
-  const isAdmin = session?.user?.email === "malikrahid011@gmail.com";
+  const isLoading = status === "loading";
+  const isAdmin = useMemo(
+    () => session?.user?.email === process.env.NEXT_PUBLIC_ADMIN_EMAIL,
+    [session?.user?.email],
+  );
 
   return (
-    <>
-      <style jsx>{`
-        .nav-links {
-          display: flex;
-          align-items: center;
-          gap: 2.5rem;
-        }
-        .mobile-btn {
-          display: none;
-        }
+    <nav className="fixed top-0 left-0 right-0 z-50 h-18 flex items-center justify-between px-4 md:px-8 border-b border-(--border) bg-[rgba(10,10,10,0.92)] backdrop-blur-md">
+      {/* Logo */}
+      <Link href="/" className="no-underline">
+        <span
+          className="font-light text-(--gold) tracking-[0.12em]"
+          style={{
+            fontFamily: "Cormorant Garamond, serif",
+            fontSize: "1.6rem",
+          }}
+        >
+          Lounge &amp; Restaurant
+        </span>
+      </Link>
 
-        @media (max-width: 768px) {
-          .nav-links {
-            display: none;
-          }
-          .mobile-btn {
-            display: block;
-          }
-          .nav-container {
-            padding: 0 1rem !important;
-          }
-        }
-      `}</style>
-
-      <nav
-        className="nav-container"
-        style={{
-          position: "fixed",
-          top: 0,
-          left: 0,
-          right: 0,
-          zIndex: 50,
-          borderBottom: "1px solid var(--border)",
-          background: "rgba(10,10,10,0.92)",
-          backdropFilter: "blur(12px)",
-          padding: "0 2rem",
-          height: "72px",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-        }}
-      >
-        {/* Logo */}
-        <Link href="/" style={{ textDecoration: "none" }}>
-          <span
-            style={{
-              fontFamily: "Cormorant Garamond, serif",
-              fontSize: "1.6rem",
-              fontWeight: 300,
-              color: "var(--gold)",
-              letterSpacing: "0.12em",
-            }}
+      {/* Desktop Links */}
+      <div className="hidden md:flex items-center gap-10">
+        {["Menu", "About", "Reservations"].map((item) => (
+          <Link
+            key={item}
+            href={item === "Menu" ? "/menu" : "#"}
+            className="no-underline text-(--muted) text-[0.8rem] tracking-[0.15em] uppercase transition-colors duration-200 hover:text-(--cream)"
           >
-            Lounge & Restaurant
-          </span>
-        </Link>
+            {item}
+          </Link>
+        ))}
 
-        {/* Desktop Links */}
-        <div className="nav-links">
+        {/* Admin Dashboard Link - Restricted & Optimized */}
+        {!isLoading && isAdmin && (
+          <Link
+            href="/admin"
+            className="no-underline text-(--gold) text-[0.8rem] tracking-[0.15em] uppercase font-bold transition-opacity duration-200 hover:opacity-80"
+          >
+            Admin
+          </Link>
+        )}
+
+        {/* Authentication Logic - Optimized with isLoading */}
+        {!isLoading && (
+          <>
+            {session ? (
+              <button
+                onClick={() => signOut()}
+                className="px-[1.4rem] py-2 border border-(--gold-dim) bg-transparent text-(--gold) text-[0.75rem] tracking-[0.15em] uppercase cursor-pointer transition-all duration-200 hover:bg-(--gold) hover:text-[#0A0A0A]"
+              >
+                Sign Out
+              </button>
+            ) : (
+              <Link
+                href="/login"
+                className="px-[1.4rem] py-2 border border-(--gold-dim) text-(--gold) no-underline text-[0.75rem] tracking-[0.15em] uppercase transition-all duration-200 hover:bg-(--gold) hover:text-[#0A0A0A]"
+              >
+                Login
+              </Link>
+            )}
+          </>
+        )}
+      </div>
+
+      {/* Mobile Toggle */}
+      <button
+        className="md:hidden bg-transparent border-none text-(--cream) cursor-pointer"
+        onClick={() => setOpen(!open)}
+      >
+        {open ? <X size={24} /> : <Menu size={24} />}
+      </button>
+
+      {/* Mobile Menu Dropdown */}
+      {open && (
+        <div className="absolute top-18 left-0 right-0 bg-[#0F0F0F] border-b border-(--border) px-8 py-8 flex flex-col gap-6 shadow-[0_20px_40px_rgba(0,0,0,0.4)]">
           {["Menu", "About", "Reservations"].map((item) => (
             <Link
               key={item}
               href={item === "Menu" ? "/menu" : "#"}
-              style={linkStyle}
-              onMouseEnter={(e) =>
-                (e.currentTarget.style.color = "var(--cream)")
-              }
-              onMouseLeave={(e) =>
-                (e.currentTarget.style.color = "var(--muted)")
-              }
+              onClick={() => setOpen(false)}
+              className="text-(--cream) no-underline text-base tracking-widest uppercase"
             >
               {item}
             </Link>
           ))}
 
-          {/* Admin Dashboard Link - Restricted to your email */}
-          {isAdmin && (
+          {/* Admin link in mobile menu */}
+          {!isLoading && isAdmin && (
             <Link
               href="/admin"
-              style={{ ...linkStyle, color: "var(--gold)", fontWeight: "bold" }}
-              onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.8")}
-              onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
+              onClick={() => setOpen(false)}
+              className="text-(--gold) no-underline uppercase font-bold tracking-widest"
             >
-              Admin
+              Admin Dashboard
             </Link>
           )}
 
-          {/* Authentication Logic */}
-          {session ? (
-            <button
-              onClick={() => signOut()}
-              style={outlineBtnStyle}
-              onMouseEnter={btnHover}
-              onMouseLeave={btnLeave}
-            >
-              Sign Out
-            </button>
-          ) : (
-            <Link
-              href="/login"
-              style={outlineBtnStyle}
-              onMouseEnter={btnHover}
-              onMouseLeave={btnLeave}
-            >
-              Login
-            </Link>
-          )}
-        </div>
-
-        {/* Mobile toggle */}
-        <button
-          className="mobile-btn"
-          onClick={() => setOpen(!open)}
-          style={{
-            color: "var(--cream)",
-            background: "none",
-            border: "none",
-            cursor: "pointer",
-          }}
-        >
-          {open ? <X size={24} /> : <Menu size={24} />}
-        </button>
-
-        {/* Mobile Menu Dropdown */}
-        {open && (
-          <div
-            style={{
-              position: "absolute",
-              top: "72px",
-              left: 0,
-              right: 0,
-              background: "#0F0F0F",
-              borderBottom: "1px solid var(--border)",
-              padding: "2rem",
-              display: "flex",
-              flexDirection: "column",
-              gap: "1.5rem",
-              boxShadow: "0 20px 40px rgba(0,0,0,0.4)",
-            }}
-          >
-            {["Menu", "About", "Reservations"].map((item) => (
-              <Link
-                key={item}
-                href={item === "Menu" ? "/menu" : "#"}
-                onClick={() => setOpen(false)}
-                style={{
-                  color: "var(--cream)",
-                  textDecoration: "none",
-                  fontSize: "1rem",
-                  letterSpacing: "0.1em",
-                  textTransform: "uppercase",
-                }}
-              >
-                {item}
-              </Link>
-            ))}
-
-            {/* Admin link in mobile menu */}
-            {isAdmin && (
-              <Link
-                href="/admin"
-                onClick={() => setOpen(false)}
-                style={{
-                  color: "var(--gold)",
-                  textDecoration: "none",
-                  textTransform: "uppercase",
-                  fontWeight: "bold",
-                }}
-              >
-                Admin Dashboard
-              </Link>
-            )}
-
-            {/* Mobile Auth link */}
-            {session ? (
+          {/* Mobile Auth link */}
+          {!isLoading &&
+            (session ? (
               <button
                 onClick={() => {
                   signOut();
                   setOpen(false);
                 }}
-                style={{
-                  ...linkStyle,
-                  background: "none",
-                  border: "none",
-                  textAlign: "left",
-                  padding: 0,
-                  cursor: "pointer",
-                }}
+                className="bg-transparent border-none text-(--muted) text-left uppercase tracking-widest text-[0.8rem] cursor-pointer p-0"
               >
                 Sign Out
               </button>
@@ -208,52 +123,13 @@ export default function Navbar() {
               <Link
                 href="/login"
                 onClick={() => setOpen(false)}
-                style={{
-                  color: "var(--gold)",
-                  textDecoration: "none",
-                  textTransform: "uppercase",
-                }}
+                className="text-(--gold) no-underline uppercase tracking-widest"
               >
                 Login
               </Link>
-            )}
-          </div>
-        )}
-      </nav>
-    </>
+            ))}
+        </div>
+      )}
+    </nav>
   );
 }
-
-// --- Reusable Styles ---
-
-const linkStyle: React.CSSProperties = {
-  color: "var(--muted)",
-  textDecoration: "none",
-  fontSize: "0.8rem",
-  letterSpacing: "0.15em",
-  textTransform: "uppercase",
-  transition: "color 0.2s",
-};
-
-const outlineBtnStyle: React.CSSProperties = {
-  padding: "0.5rem 1.4rem",
-  border: "1px solid var(--gold-dim)",
-  background: "transparent",
-  color: "var(--gold)",
-  textDecoration: "none",
-  fontSize: "0.75rem",
-  letterSpacing: "0.15em",
-  textTransform: "uppercase",
-  transition: "all 0.2s",
-  cursor: "pointer",
-};
-
-const btnHover = (e: any) => {
-  e.currentTarget.style.background = "var(--gold)";
-  e.currentTarget.style.color = "#0A0A0A";
-};
-
-const btnLeave = (e: any) => {
-  e.currentTarget.style.background = "transparent";
-  e.currentTarget.style.color = "var(--gold)";
-};

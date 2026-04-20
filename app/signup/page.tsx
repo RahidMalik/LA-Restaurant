@@ -30,14 +30,11 @@ export default function SignUpPage() {
     }
 
     try {
-      // Simulate account creation or call your API here
       console.log("Creating account for:", formData.email);
-      setTimeout(() => {
-        router.push("/login");
-      }, 1500);
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+      router.push("/login");
     } catch (err) {
       setError("Something went wrong. Please try again.");
-    } finally {
       setLoading(false);
     }
   };

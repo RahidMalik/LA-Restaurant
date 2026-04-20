@@ -1,98 +1,162 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react"; // useMemo add kiya
 import Navbar from "@/components/Navbar";
 import MenuCard from "@/components/MenuCard";
-import { getAllMenuItems, getCategories } from "@/lib/api";
+// import { getAllMenuItems, getCategories } from "@/lib/api";
 import type { MenuItem, Category } from "@/types";
-import { Search, LayoutGrid, Sunrise, Leaf, UtensilsCrossed, Cake, Coffee, GlassWater, Milk, type LucideIcon } from "lucide-react";
+import {
+  Search,
+  Grid2X2,
+  Sun,
+  Leaf,
+  Utensils,
+  Cookie,
+  Coffee,
+  Droplets,
+  FlaskConical,
+  type LucideIcon,
+} from "lucide-react";
 
 // ── Import demo data from spread file ────────────────────
 import { DEMO_ITEMS, DEMO_CATEGORIES } from "@/data/Menuitems";
 
 // ── Map icon name → lucide component ─────────────────────
 const ICON_MAP: Record<string, LucideIcon> = {
-  LayoutGrid, Sunrise, Leaf, UtensilsCrossed,
-  Cake, Coffee, GlassWater, Milk,
+  Grid2X2,
+  Sun,
+  Leaf,
+  Utensils,
+  Cookie,
+  Coffee,
+  Droplets,
+  FlaskConical,
 };
 
-function CategoryIcon({ name, size = 13 }: { name: string; size?: number }) {
-  const Icon = ICON_MAP[name];
+// ── Fallback: map category slug → icon name ───────────────
+const SLUG_ICON: Record<string, string> = {
+  all: "Grid2X2",
+  breakfast: "Sun",
+  starters: "Leaf",
+  mains: "Utensils",
+  desserts: "Cookie",
+  drinks: "Coffee",
+  soft: "Droplets",
+  lassi: "FlaskConical",
+};
+
+function CategoryIcon({
+  name,
+  slug,
+  size = 13,
+}: {
+  name: string;
+  slug?: string;
+  size?: number;
+}) {
+  const iconName = ICON_MAP[name] ? name : slug ? SLUG_ICON[slug] : undefined;
+  const Icon = iconName ? ICON_MAP[iconName] : undefined;
   return Icon ? <Icon size={size} strokeWidth={1.5} /> : null;
 }
 
 export default function MenuPage() {
-  const [items, setItems]           = useState<MenuItem[]>(DEMO_ITEMS);
+  const [items, setItems] = useState<MenuItem[]>(DEMO_ITEMS);
   const [categories, setCategories] = useState<Category[]>(DEMO_CATEGORIES);
-  const [active, setActive]         = useState("all");
-  const [search, setSearch]         = useState("");
+  const [active, setActive] = useState("all");
+  const [search, setSearch] = useState("");
 
-  useEffect(() => {
-    // Try to load from DB, fallback to demo data
-    getAllMenuItems()
-      .then((data) => { if (data?.length > 0) setItems(data); })
-      .catch(() => {});
-
-    getCategories()
-      .then((cats) => {
-        if (cats?.length > 0) {
-          setCategories([
-            { id: "all", name: "All Items", slug: "all", icon: "✦" },
-            ...cats,
-          ]);
-        }
-      })
-      .catch(() => {});
-  }, []);
-
-  const filtered = items.filter((item) => {
-    const matchCat    = active === "all" || item.category === active;
-    const matchSearch =
-      item.name.toLowerCase().includes(search.toLowerCase()) ||
-      item.description.toLowerCase().includes(search.toLowerCase());
-    return matchCat && matchSearch;
-  });
+  // ── Optimized filtering with useMemo ─────────────────────
+  const filtered = useMemo(() => {
+    return items.filter((item) => {
+      const matchCat = active === "all" || item.category === active;
+      const matchSearch =
+        item.name.toLowerCase().includes(search.toLowerCase()) ||
+        item.description.toLowerCase().includes(search.toLowerCase());
+      return matchCat && matchSearch;
+    });
+  }, [items, active, search]);
 
   return (
     <>
       <Navbar />
       <div style={{ paddingTop: "72px", minHeight: "100vh" }}>
-
         {/* Page header */}
-        <div style={{
-          textAlign: "center", padding: "5rem 1.5rem 3rem",
-          borderBottom: "1px solid var(--border)",
-        }}>
-          <span style={{ color: "var(--gold)", fontSize: "0.7rem", letterSpacing: "0.25em", textTransform: "uppercase" }}>
+        <div
+          style={{
+            textAlign: "center",
+            padding: "5rem 1.5rem 3rem",
+            borderBottom: "1px solid var(--border)",
+          }}
+        >
+          <span
+            style={{
+              color: "var(--gold)",
+              fontSize: "0.7rem",
+              letterSpacing: "0.25em",
+              textTransform: "uppercase",
+            }}
+          >
             Explore
           </span>
-          <h1 style={{
-            fontFamily: "Cormorant Garamond, serif",
-            fontSize: "clamp(2.5rem, 6vw, 4.5rem)",
-            fontWeight: 300, color: "var(--cream)", marginTop: "0.3rem",
-          }}>
+          <h1
+            style={{
+              fontFamily: "Cormorant Garamond, serif",
+              fontSize: "clamp(2.5rem, 6vw, 4.5rem)",
+              fontWeight: 300,
+              color: "var(--cream)",
+              marginTop: "0.3rem",
+            }}
+          >
             Our Menu
           </h1>
-          <p style={{ color: "var(--muted)", fontSize: "0.85rem", marginTop: "0.8rem" }}>
+          <p
+            style={{
+              color: "var(--muted)",
+              fontSize: "0.85rem",
+              marginTop: "0.8rem",
+            }}
+          >
             All prices are subject to tax · 10% service charge applies
           </p>
         </div>
 
-        <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "3rem 1.5rem" }}>
-
+        <div
+          style={{
+            maxWidth: "1200px",
+            margin: "0 auto",
+            padding: "3rem 1.5rem",
+          }}
+        >
           {/* Search */}
-          <div style={{ position: "relative", maxWidth: "420px", margin: "0 auto 2.5rem" }}>
-            <Search size={16} style={{
-              position: "absolute", left: "14px", top: "50%",
-              transform: "translateY(-50%)", color: "var(--muted)",
-            }} />
+          <div
+            style={{
+              position: "relative",
+              maxWidth: "420px",
+              margin: "0 auto 2.5rem",
+            }}
+          >
+            <Search
+              size={16}
+              style={{
+                position: "absolute",
+                left: "14px",
+                top: "50%",
+                transform: "translateY(-50%)",
+                color: "var(--muted)",
+              }}
+            />
             <input
-              value={search} onChange={(e) => setSearch(e.target.value)}
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
               placeholder="Search dishes..."
               style={{
-                width: "100%", padding: "0.75rem 1rem 0.75rem 2.6rem",
-                background: "var(--surface)", border: "1px solid var(--border)",
-                color: "var(--cream)", fontSize: "0.85rem", outline: "none",
+                width: "100%",
+                padding: "0.75rem 1rem 0.75rem 2.6rem",
+                background: "var(--surface)",
+                border: "1px solid var(--border)",
+                color: "var(--cream)",
+                fontSize: "0.85rem",
+                outline: "none",
               }}
               onFocus={(e) => (e.target.style.borderColor = "var(--gold-dim)")}
               onBlur={(e) => (e.target.style.borderColor = "var(--border)")}
@@ -100,10 +164,15 @@ export default function MenuPage() {
           </div>
 
           {/* Category Tabs */}
-          <div style={{
-            display: "flex", gap: "0.5rem", flexWrap: "wrap",
-            justifyContent: "center", marginBottom: "3rem",
-          }}>
+          <div
+            style={{
+              display: "flex",
+              gap: "0.5rem",
+              flexWrap: "wrap",
+              justifyContent: "center",
+              marginBottom: "3rem",
+            }}
+          >
             {categories.map((cat) => (
               <button
                 key={cat.id}
@@ -111,44 +180,65 @@ export default function MenuPage() {
                 style={{
                   padding: "0.5rem 1.2rem",
                   border: "1px solid",
-                  borderColor: active === cat.slug ? "var(--gold)" : "var(--border)",
-                  background: active === cat.slug ? "rgba(200,169,110,0.1)" : "transparent",
+                  borderColor:
+                    active === cat.slug ? "var(--gold)" : "var(--border)",
+                  background:
+                    active === cat.slug
+                      ? "rgba(200,169,110,0.1)"
+                      : "transparent",
                   color: active === cat.slug ? "var(--gold)" : "var(--muted)",
-                  fontSize: "0.72rem", letterSpacing: "0.1em",
-                  textTransform: "uppercase", cursor: "pointer", transition: "all 0.2s",
-                  display: "flex", alignItems: "center", gap: "5px",
+                  fontSize: "0.72rem",
+                  letterSpacing: "0.1em",
+                  textTransform: "uppercase",
+                  cursor: "pointer",
+                  transition: "all 0.2s",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "5px",
                 }}
               >
-                <CategoryIcon name={cat.icon} />
+                <CategoryIcon name={cat.icon} slug={cat.slug} />
                 {cat.name}
               </button>
             ))}
           </div>
 
           {/* Result count */}
-          <p style={{
-            color: "var(--muted)", fontSize: "0.78rem",
-            letterSpacing: "0.08em", textAlign: "center", marginBottom: "2rem",
-          }}>
+          <p
+            style={{
+              color: "var(--muted)",
+              fontSize: "0.78rem",
+              letterSpacing: "0.08em",
+              textAlign: "center",
+              marginBottom: "2rem",
+            }}
+          >
             {filtered.length} {filtered.length === 1 ? "item" : "items"}
-            {active !== "all" ? ` in ${categories.find(c => c.slug === active)?.name}` : ""}
+            {active !== "all"
+              ? ` in ${categories.find((c) => c.slug === active)?.name}`
+              : ""}
           </p>
 
           {/* Items Grid */}
           {filtered.length === 0 ? (
-            <div style={{ textAlign: "center", color: "var(--muted)", padding: "4rem 0" }}>
+            <div
+              style={{
+                textAlign: "center",
+                color: "var(--muted)",
+                padding: "4rem 0",
+              }}
+            >
               <p style={{ fontSize: "2rem", marginBottom: "1rem" }}>✦</p>
               <p>No items found.</p>
             </div>
           ) : (
-            <div style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
-              gap: "1.5rem",
-            }}>
+            <div className="grid grid-cols-1 min-[400px]:grid-cols-2 lg:grid-cols-3 gap-6">
               {filtered.map((item, i) => (
-                <div key={item.id} className="fade-up"
-                  style={{ animationDelay: `${i * 0.04}s`, opacity: 0 }}>
+                <div
+                  key={item.id}
+                  className="fade-up"
+                  style={{ animationDelay: `${i * 0.04}s`, opacity: 0 }}
+                >
                   <MenuCard item={item} />
                 </div>
               ))}

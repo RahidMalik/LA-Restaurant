@@ -463,7 +463,7 @@ export default function AdminPage() {
                   <button
                     onClick={() =>
                       toggleItemAvailability(item.id, !item.is_available).then(
-                        loadItems,
+                        () => loadItems(),
                       )
                     }
                     title={item.is_available ? "Hide" : "Show"}
@@ -479,7 +479,9 @@ export default function AdminPage() {
                   </button>
                   <button
                     onClick={() =>
-                      toggleFeatured(item.id, !item.is_featured).then(loadItems)
+                      toggleFeatured(item.id, !item.is_featured).then(() =>
+                        loadItems(),
+                      )
                     }
                     title="Toggle Featured"
                     style={iconBtnStyle(

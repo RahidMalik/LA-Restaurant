@@ -6,14 +6,14 @@ import type { MenuItem, Category } from "@/types";
 // ─────────────────────────────────────────────────────────────
 
 export const DEMO_CATEGORIES: Category[] = [
-  { id: "all",       name: "All Items",   slug: "all",       icon: "LayoutGrid"       },
-  { id: "breakfast", name: "Breakfast",   slug: "breakfast", icon: "Sunrise"          },
-  { id: "starters",  name: "Starters",    slug: "starters",  icon: "Leaf"             },
-  { id: "mains",     name: "Mains",       slug: "mains",     icon: "UtensilsCrossed"  },
-  { id: "desserts",  name: "Desserts",    slug: "desserts",  icon: "Cake"             },
-  { id: "drinks",    name: "Hot Drinks",  slug: "drinks",    icon: "Coffee"           },
-  { id: "soft",      name: "Soft Drinks", slug: "soft",      icon: "GlassWater"       },
-  { id: "lassi",     name: "Lassi",       slug: "lassi",     icon: "Milk"             },
+  { id: "all", name: "All Items", slug: "all", icon: "Grid2X2" },
+  { id: "breakfast", name: "Breakfast", slug: "breakfast", icon: "Sun" },
+  { id: "starters", name: "Starters", slug: "starters", icon: "Leaf" },
+  { id: "mains", name: "Mains", slug: "mains", icon: "Utensils" },
+  { id: "desserts", name: "Desserts", slug: "desserts", icon: "Cookie" },
+  { id: "drinks", name: "Hot Drinks", slug: "drinks", icon: "Coffee" },
+  { id: "soft", name: "Soft Drinks", slug: "soft", icon: "Droplets" },
+  { id: "lassi", name: "Lassi", slug: "lassi", icon: "FlaskConical" },
 ];
 
 export const DEMO_ITEMS: MenuItem[] = [
@@ -332,4 +332,12 @@ export const DEMO_ITEMS: MenuItem[] = [
     image_url: "https://images.unsplash.com/photo-1571805529673-0f56b922b359?w=600&q=80",
     is_available: true, is_featured: false, created_at: "",
   },
+  {
+    id: "l2", name: "Salty Lassi", price: 450,
+    description: "Refreshing salted yogurt drink with a hint of roasted cumin.",
+    category: "lassi",
+    image_url: "https://images.unsplash.com/photo-1571805529673-0f56b922b359?w=600&q=80",
+    is_available: true, is_featured: false, created_at: "",
+  },
+
 ];
