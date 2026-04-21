@@ -15,7 +15,7 @@ export default function HomePage() {
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
-          justifyContent: "flex-start",
+          justifyContent: "center",
           textAlign: "center",
           padding: "0 1.5rem",
           position: "relative",
