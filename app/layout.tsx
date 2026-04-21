@@ -22,7 +22,7 @@ export default async function RootLayout({
   }
 
   return (
-    <html lang="en">
+    <html lang="en" data-scroll-behavior="smooth">
       <body>
         <AuthProvider session={session}>{children}</AuthProvider>
       </body>

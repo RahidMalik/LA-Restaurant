@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useSession, signIn, signOut } from "next-auth/react"; // Replaced sessionStorage logic
+import { useEffect, useState } from "react";
+import { useSession, signOut } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import type { MenuItem } from "@/types";
 import {
   getAllMenuItems,
@@ -11,7 +12,7 @@ import {
   toggleFeatured,
   uploadItemImage,
 } from "@/lib/api";
-import { Plus, Trash2, Eye, EyeOff, Star, LogOut, ChefHat } from "lucide-react";
+import { Plus, Trash2, Eye, EyeOff, Star, LogOut } from "lucide-react";
 
 const EMPTY_FORM = {
   name: "",
@@ -24,43 +25,31 @@ const EMPTY_FORM = {
 };
 
 export default function AdminPage() {
-  const { data: session, status } = useSession(); // NextAuth Session
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [loginErr, setLoginErr] = useState("");
+  const { data: session, status } = useSession();
+  const router = useRouter();
   const [items, setItems] = useState<MenuItem[]>([]);
   const [form, setForm] = useState(EMPTY_FORM);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState("");
 
-  // Load items only when authenticated via NextAuth
+  const isAdmin = session?.user?.email === process.env.NEXT_PUBLIC_ADMIN_EMAIL;
+
+  // ── Auth guard ────────────────────────────────────────
   useEffect(() => {
-    if (status === "authenticated") {
-      loadItems();
-    }
-  }, [status]);
+    if (status === "loading") return;
+    if (status === "unauthenticated") router.replace("/login");
+    if (status === "authenticated" && !isAdmin) router.replace("/");
+  }, [status, isAdmin, router]);
+
+  useEffect(() => {
+    if (status === "authenticated" && isAdmin) loadItems();
+  }, [status, isAdmin]);
 
   async function loadItems() {
     try {
       setItems(await getAllMenuItems());
     } catch {}
-  }
-
-  async function handleLogin(e: React.FormEvent) {
-    e.preventDefault();
-    setLoginErr("");
-
-    // Call NextAuth Sign-In
-    const res = await signIn("credentials", {
-      email,
-      password,
-      redirect: false, // Keep them on the same page to show error if needed
-    });
-
-    if (res?.error) {
-      setLoginErr("Invalid email or password.");
-    }
   }
 
   async function handleAdd(e: React.FormEvent) {
@@ -88,90 +77,12 @@ export default function AdminPage() {
     loadItems();
   }
 
-  // ── Login Screen (Design preserved exactly) ────────────────────────
-  if (status === "unauthenticated" || status === "loading") {
-    if (status === "loading")
-      return <div style={{ background: "var(--bg)", minHeight: "100vh" }} />;
-
-    return (
-      <div
-        style={{
-          minHeight: "100vh",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          background: "var(--bg)",
-          padding: "1.5rem",
-        }}
-      >
-        <div
-          style={{
-            width: "100%",
-            maxWidth: "380px",
-            border: "1px solid var(--border)",
-            padding: "3rem 2.5rem",
-            background: "var(--surface)",
-          }}
-        >
-          <div style={{ textAlign: "center", marginBottom: "2.5rem" }}>
-            <ChefHat
-              size={32}
-              style={{ color: "var(--gold)", marginBottom: "1rem" }}
-            />
-            <h1
-              style={{
-                fontFamily: "Cormorant Garamond, serif",
-                fontSize: "1.8rem",
-                fontWeight: 300,
-                color: "var(--cream)",
-              }}
-            >
-              Admin Panel
-            </h1>
-            <p
-              style={{
-                color: "var(--muted)",
-                fontSize: "0.8rem",
-                marginTop: "0.3rem",
-              }}
-            >
-              LA - Restaurant
-            </p>
-          </div>
-
-          <form
-            onSubmit={handleLogin}
-            style={{ display: "flex", flexDirection: "column", gap: "1rem" }}
-          >
-            <input
-              type="email"
-              placeholder="Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              style={inputStyle}
-            />
-            <input
-              type="password"
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              style={inputStyle}
-            />
-            {loginErr && (
-              <p style={{ color: "#C0392B", fontSize: "0.8rem" }}>{loginErr}</p>
-            )}
-            <button type="submit" style={goldBtnStyle}>
-              Sign In
-            </button>
-          </form>
-        </div>
-      </div>
-    );
+  // ── Loading / redirecting ─────────────────────────────
+  if (status === "loading" || !isAdmin) {
+    return <div style={{ background: "var(--bg)", minHeight: "100vh" }} />;
   }
 
-  // ── Dashboard (Design preserved exactly) ─────────────────────────────────────────
+  // ── Dashboard ─────────────────────────────────────────
   return (
     <div style={{ minHeight: "100vh", background: "var(--bg)" }}>
       {/* Top bar */}
@@ -195,7 +106,7 @@ export default function AdminPage() {
           LA - Restaurant — Admin
         </span>
         <button
-          onClick={() => signOut()}
+          onClick={() => signOut({ callbackUrl: "/" })}
           style={{
             background: "none",
             border: "1px solid var(--border)",
@@ -463,7 +374,7 @@ export default function AdminPage() {
                   <button
                     onClick={() =>
                       toggleItemAvailability(item.id, !item.is_available).then(
-                        () => loadItems(),
+                        loadItems,
                       )
                     }
                     title={item.is_available ? "Hide" : "Show"}
@@ -479,9 +390,7 @@ export default function AdminPage() {
                   </button>
                   <button
                     onClick={() =>
-                      toggleFeatured(item.id, !item.is_featured).then(() =>
-                        loadItems(),
-                      )
+                      toggleFeatured(item.id, !item.is_featured).then(loadItems)
                     }
                     title="Toggle Featured"
                     style={iconBtnStyle(
@@ -506,7 +415,6 @@ export default function AdminPage() {
   );
 }
 
-// ── Styles (Preserved exactly) ────────────────────────
 const inputStyle: React.CSSProperties = {
   background: "var(--bg)",
   border: "1px solid var(--border)",

@@ -9,51 +9,153 @@ export default function HomePage() {
       <Navbar />
 
       {/* --- HERO SECTION --- */}
-      <section className="min-h-screen flex flex-col items-center justify-center text-center px-6 relative overflow-hidden">
+      <section
+        style={{
+          minHeight: "100vh",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          textAlign: "center",
+          padding: "0 1.5rem",
+          position: "relative",
+          overflow: "hidden",
+        }}
+      >
         {/* Decorative background gradient */}
         <div
-          className="absolute inset-0 pointer-events-none opacity-40"
           style={{
+            position: "absolute",
+            inset: 0,
             background:
-              "radial-gradient(ellipse 80% 60% at 50% 40%, rgba(200,169,110,0.15) 0%, transparent 70%)",
+              "radial-gradient(ellipse 80% 60% at 50% 40%, rgba(200,169,110,0.1) 0%, transparent 70%)",
+            pointerEvents: "none",
+            opacity: 0.6,
           }}
         />
 
-        {/* Est. 2024 Header */}
-        <div className="fade-up flex items-center gap-4 mb-8">
-          <span className="block w-10 h-px bg-(--gold-dim)" />
-          <span className="text-(--gold) text-[0.7rem] tracking-[0.3em] uppercase font-medium">
-            Est. 2024
+        {/* Est. 2026 Header */}
+        <div
+          className="fade-up"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "1.2rem",
+            marginBottom: "2.5rem",
+          }}
+        >
+          <span
+            style={{
+              display: "block",
+              width: "40px",
+              height: "1px",
+              background: "var(--gold-dim)",
+            }}
+          />
+          <span
+            style={{
+              color: "var(--gold)",
+              fontSize: "0.7rem",
+              letterSpacing: "0.3em",
+              textTransform: "uppercase",
+              fontWeight: 500,
+            }}
+          >
+            Est. 2026
           </span>
-          <span className="block w-10 h-px bg-(--gold-dim)" />
+          <span
+            style={{
+              display: "block",
+              width: "40px",
+              height: "1px",
+              background: "var(--gold-dim)",
+            }}
+          />
         </div>
 
-        {/* Main Title */}
+        {/* Main Title (Design from old code) */}
         <h1
-          className="fade-up fade-up-delay-1 text-[clamp(3.5rem,10vw,7.5rem)] font-light leading-[0.95] text-(--cream) tracking-tight mb-6"
-          style={{ fontFamily: "Cormorant Garamond, serif" }}
+          className="fade-up fade-up-delay-1"
+          style={{
+            fontFamily: "Cormorant Garamond, serif",
+            fontSize: "clamp(3.5rem, 10vw, 7.5rem)",
+            fontWeight: 300,
+            lineHeight: 0.95,
+            color: "var(--cream)",
+            letterSpacing: "-0.01em",
+            marginBottom: "1.5rem",
+          }}
         >
           Lounge & <br />
-          <em className="text-(--gold) italic">Restaurant</em>
+          <em style={{ color: "var(--gold)", fontStyle: "italic" }}>
+            Restaurant
+          </em>
         </h1>
 
         {/* Subtitle */}
-        <p className="fade-up fade-up-delay-2 text-(--muted) text-[0.95rem] tracking-wide max-w-90 leading-relaxed mb-10">
+        <p
+          className="fade-up fade-up-delay-2"
+          style={{
+            color: "var(--muted)",
+            fontSize: "0.95rem",
+            letterSpacing: "0.05em",
+            maxWidth: "380px",
+            lineHeight: 1.7,
+            marginBottom: "3rem",
+          }}
+        >
           An exquisite culinary journey through refined flavours, crafted with
           passion and served with grace.
         </p>
 
         {/* Action Buttons */}
-        <div className="fade-up fade-up-delay-3 flex flex-wrap justify-center gap-4">
+        <div
+          className="fade-up fade-up-delay-3"
+          style={{
+            display: "flex",
+            gap: "1.2rem",
+            flexWrap: "wrap",
+            justifyContent: "center",
+          }}
+        >
           <Link
             href="/menu"
-            className="px-9 py-3.5 bg-(--gold) text-[#0A0A0A] text-[0.75rem] tracking-[0.18em] uppercase font-semibold transition-all hover:opacity-85"
+            style={{
+              padding: "0.9rem 2.4rem",
+              background: "var(--gold)",
+              color: "#0A0A0A",
+              textDecoration: "none",
+              fontSize: "0.75rem",
+              letterSpacing: "0.18em",
+              textTransform: "uppercase",
+              fontWeight: 600,
+              transition: "opacity 0.2s",
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.85")}
+            onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
           >
             Explore Menu
           </Link>
           <Link
             href="#reservations"
-            className="px-9 py-3.5 border border-(--border) text-(--cream) text-[0.75rem] tracking-[0.18em] uppercase transition-all hover:border-(--gold-dim)"
+            style={{
+              padding: "0.9rem 2.4rem",
+              border: "1px solid var(--border)",
+              color: "var(--cream)",
+              textDecoration: "none",
+              fontSize: "0.75rem",
+              letterSpacing: "0.18em",
+              textTransform: "uppercase",
+              transition: "all 0.2s",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.borderColor = "var(--gold-dim)";
+              e.currentTarget.style.background = "rgba(255,255,255,0.02)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.borderColor = "var(--border)";
+              e.currentTarget.style.background = "transparent";
+            }}
           >
             Reserve a Table
           </Link>
@@ -61,21 +163,50 @@ export default function HomePage() {
       </section>
 
       {/* --- INFO BAR --- */}
-      <section className="border-y border-(--border) py-16 px-8 bg-[#0D0D0D]">
-        <div className="max-w-250 mx-auto flex flex-wrap justify-around gap-10 text-center">
+      <section
+        style={{
+          borderTop: "1px solid var(--border)",
+          borderBottom: "1px solid var(--border)",
+          padding: "4rem 2rem",
+          background: "#0D0D0D",
+        }}
+      >
+        <div
+          style={{
+            maxWidth: "1000px",
+            margin: "0 auto",
+            display: "flex",
+            flexWrap: "wrap",
+            justifyContent: "space-around",
+            gap: "3rem",
+            textAlign: "center",
+          }}
+        >
           {[
-            {
-              label: "Location",
-              value: "B 159 Johar Hill Road, Karachi, Pakistan",
-            },
+            { label: "Location", value: "B 159 Johar Hill Road, Karachi" },
             { label: "Hours", value: "12pm – 3am Daily" },
             { label: "Reservations", value: "+92 3111147647" },
           ].map(({ label, value }) => (
-            <div key={label} className="flex flex-col gap-2 min-w-50">
-              <p className="text-(--gold)text-[0.65rem] tracking-[0.2em] uppercase font-medium">
+            <div key={label} style={{ minWidth: "200px" }}>
+              <p
+                style={{
+                  color: "var(--gold)",
+                  fontSize: "0.65rem",
+                  letterSpacing: "0.25em",
+                  textTransform: "uppercase",
+                  marginBottom: "0.6rem",
+                  fontWeight: 500,
+                }}
+              >
                 {label}
               </p>
-              <p className="text-(--cream) text-[0.95rem] leading-snug">
+              <p
+                style={{
+                  color: "var(--cream)",
+                  fontSize: "0.95rem",
+                  lineHeight: 1.5,
+                }}
+              >
                 {value}
               </p>
             </div>
@@ -84,8 +215,15 @@ export default function HomePage() {
       </section>
 
       {/* --- FOOTER --- */}
-      <footer className="py-12 text-center opacity-60">
-        <p className="text-(--muted) text-[0.75rem] tracking-widest">
+      <footer style={{ padding: "3rem", textAlign: "center", opacity: 0.6 }}>
+        <p
+          style={{
+            color: "var(--muted)",
+            fontSize: "0.7rem",
+            letterSpacing: "0.15em",
+            textTransform: "uppercase",
+          }}
+        >
           © 2026 LA — RESTAURANT. ALL RIGHTS RESERVED.
         </p>
       </footer>

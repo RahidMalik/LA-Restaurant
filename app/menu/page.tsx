@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react"; // useMemo add kiya
+import { useState, useEffect, useMemo } from "react";
 import Navbar from "@/components/Navbar";
 import MenuCard from "@/components/MenuCard";
 // import { getAllMenuItems, getCategories } from "@/lib/api";
@@ -20,6 +20,12 @@ import {
 
 // ── Import demo data from spread file ────────────────────
 import { DEMO_ITEMS, DEMO_CATEGORIES } from "@/data/Menuitems";
+
+interface MenuPageProps {
+  name: string;
+  slug?: string;
+  size?: number;
+}
 
 // ── Map icon name → lucide component ─────────────────────
 const ICON_MAP: Record<string, LucideIcon> = {
@@ -45,15 +51,7 @@ const SLUG_ICON: Record<string, string> = {
   lassi: "FlaskConical",
 };
 
-function CategoryIcon({
-  name,
-  slug,
-  size = 13,
-}: {
-  name: string;
-  slug?: string;
-  size?: number;
-}) {
+function CategoryIcon({ name, slug, size = 13 }: Readonly<MenuPageProps>) {
   const iconName = ICON_MAP[name] ? name : slug ? SLUG_ICON[slug] : undefined;
   const Icon = iconName ? ICON_MAP[iconName] : undefined;
   return Icon ? <Icon size={size} strokeWidth={1.5} /> : null;
@@ -63,18 +61,30 @@ export default function MenuPage() {
   const [items, setItems] = useState<MenuItem[]>(DEMO_ITEMS);
   const [categories, setCategories] = useState<Category[]>(DEMO_CATEGORIES);
   const [active, setActive] = useState("all");
-  const [search, setSearch] = useState("");
+
+  const [searchInput, setSearchInput] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+
+  // ── Debounce Logic ───────────────────────────────────────
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchInput);
+    }, 400);
+
+    return () => clearTimeout(timer);
+  }, [searchInput]);
 
   // ── Optimized filtering with useMemo ─────────────────────
   const filtered = useMemo(() => {
     return items.filter((item) => {
       const matchCat = active === "all" || item.category === active;
+
       const matchSearch =
-        item.name.toLowerCase().includes(search.toLowerCase()) ||
-        item.description.toLowerCase().includes(search.toLowerCase());
+        item.name.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
+        item.description.toLowerCase().includes(debouncedSearch.toLowerCase());
       return matchCat && matchSearch;
     });
-  }, [items, active, search]);
+  }, [items, active, debouncedSearch]);
 
   return (
     <>
@@ -146,8 +156,8 @@ export default function MenuPage() {
               }}
             />
             <input
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
               placeholder="Search dishes..."
               style={{
                 width: "100%",
@@ -232,7 +242,7 @@ export default function MenuPage() {
               <p>No items found.</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 min-[400px]:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 min-[600px]:grid-cols-2 md:grid-cols-3 gap-6">
               {filtered.map((item, i) => (
                 <div
                   key={item.id}
