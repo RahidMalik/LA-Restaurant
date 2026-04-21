@@ -38,8 +38,8 @@ export default function Navbar() {
   // Links data with Icons
   const navLinks = [
     { name: "Menu", href: "/menu", icon: <UtensilsCrossed size={16} /> },
-    { name: "About", href: "#", icon: <Info size={16} /> },
-    { name: "Reservations", href: "#", icon: <CalendarDays size={16} /> },
+    { name: "About", href: "/about", icon: <Info size={16} /> },
+    { name: "Reservations", href: "/reservations", icon: <CalendarDays size={16} /> },
   ];
 
   const desktopButtonStyle = {
