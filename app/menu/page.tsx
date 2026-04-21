@@ -177,7 +177,7 @@ export default function MenuPage() {
           <div
             style={{
               display: "flex",
-              gap: "0.5rem",
+              gap: "0.8rem",
               flexWrap: "wrap",
               justifyContent: "center",
               marginBottom: "3rem",
@@ -190,6 +190,8 @@ export default function MenuPage() {
                 style={{
                   padding: "0.5rem 1.2rem",
                   border: "1px solid",
+                  minWidth: "140px",
+                  justifyContent: "center",
                   borderColor:
                     active === cat.slug ? "var(--gold)" : "var(--border)",
                   background:
