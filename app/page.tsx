@@ -150,7 +150,7 @@ export default function HomePage() {
               Explore Menu
             </Link>
             <Link
-              href="#reservations"
+              href="/reservations"
               style={{
                 padding: "1rem 2.6rem",
                 border: "1px solid var(--border)",

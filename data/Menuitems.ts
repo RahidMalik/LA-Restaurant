@@ -41,13 +41,6 @@ export const DEMO_ITEMS: MenuItem[] = [
     is_available: true, is_featured: false, created_at: "",
   },
   {
-    id: "b4", name: "Scrambled Eggs", price: 1649,
-    description: "Fluffy scrambled eggs with a choice of mushrooms and/or pepperoni. Served with roasted potatoes and salad.",
-    category: "breakfast",
-    image_url: "https://images.unsplash.com/photo-1614977645540-7abd88ba8e9e?w=600&q=80",
-    is_available: true, is_featured: false, created_at: "",
-  },
-  {
     id: "b5", name: "Mediterranean Omelette", price: 1749,
     description: "Feta cheese, bell peppers, tomato, olives, mushrooms, and basil omelette. Served with salad and grilled tomato.",
     category: "breakfast",
@@ -108,13 +101,6 @@ export const DEMO_ITEMS: MenuItem[] = [
     description: "Wholesome yogurt mixed with Blueberries, Toasted Homemade Granola and topped with Honey.",
     category: "breakfast",
     image_url: "https://images.unsplash.com/photo-1490818387583-1baba5e638af?w=600&q=80",
-    is_available: true, is_featured: false, created_at: "",
-  },
-  {
-    id: "b14", name: "Nutella French Toast", price: 1649,
-    description: "Golden French Toast stuffed with dollops of Nutella and topped with Whipped Cream.",
-    category: "breakfast",
-    image_url: "https://images.unsplash.com/photo-1484723091739-30990a8dbb4e?w=600&q=80",
     is_available: true, is_featured: false, created_at: "",
   },
   {
