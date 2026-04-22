@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/lib/auth";
 import AuthProvider from "@/components/AuthProvider";
 import "./globals.css";
+import { ThemeProvider } from "@/context/ThemeContext";
 
 export const metadata: Metadata = {
   title: "LA — Restaurant",
@@ -22,9 +23,33 @@ export default async function RootLayout({
   }
 
   return (
-    <html lang="en" data-scroll-behavior="smooth">
+    <html
+      lang="en"
+      data-scroll-behavior="smooth"
+      data-theme="dark"
+      suppressHydrationWarning
+    >
+      <head>
+        {/* Prevent theme flash on page load */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+            (function() {
+              try {
+                var t = localStorage.getItem('la-theme');
+                if (t === 'light' || t === 'dark') {
+                  document.documentElement.setAttribute('data-theme', t);
+                }
+              } catch(e) {}
+            })();
+          `,
+          }}
+        />
+      </head>
       <body>
-        <AuthProvider session={session}>{children}</AuthProvider>
+        <ThemeProvider>
+          <AuthProvider session={session}>{children}</AuthProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

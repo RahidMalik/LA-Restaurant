@@ -1,9 +1,9 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import Navbar from "@/components/Navbar";
 import MenuCard from "@/components/MenuCard";
-// import { getAllMenuItems, getCategories } from "@/lib/api";
 import type { MenuItem, Category } from "@/types";
 import {
   Search,
@@ -15,10 +15,10 @@ import {
   Coffee,
   Droplets,
   FlaskConical,
+  X,
   type LucideIcon,
 } from "lucide-react";
 
-// ── Import demo data from spread file ────────────────────
 import { DEMO_ITEMS, DEMO_CATEGORIES } from "@/data/Menuitems";
 
 interface MenuPageProps {
@@ -27,7 +27,6 @@ interface MenuPageProps {
   size?: number;
 }
 
-// ── Map icon name → lucide component ─────────────────────
 const ICON_MAP: Record<string, LucideIcon> = {
   Grid2X2,
   Sun,
@@ -39,7 +38,6 @@ const ICON_MAP: Record<string, LucideIcon> = {
   FlaskConical,
 };
 
-// ── Fallback: map category slug → icon name ───────────────
 const SLUG_ICON: Record<string, string> = {
   all: "Grid2X2",
   breakfast: "Sun",
@@ -58,27 +56,23 @@ function CategoryIcon({ name, slug, size = 13 }: Readonly<MenuPageProps>) {
 }
 
 export default function MenuPage() {
-  const [items, setItems] = useState<MenuItem[]>(DEMO_ITEMS);
-  const [categories, setCategories] = useState<Category[]>(DEMO_CATEGORIES);
+  const [items] = useState<MenuItem[]>(DEMO_ITEMS);
+  const [categories] = useState<Category[]>(DEMO_CATEGORIES);
   const [active, setActive] = useState("all");
 
   const [searchInput, setSearchInput] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
 
-  // ── Debounce Logic ───────────────────────────────────────
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearch(searchInput);
     }, 400);
-
     return () => clearTimeout(timer);
   }, [searchInput]);
 
-  // ── Optimized filtering with useMemo ─────────────────────
   const filtered = useMemo(() => {
     return items.filter((item) => {
       const matchCat = active === "all" || item.category === active;
-
       const matchSearch =
         item.name.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
         item.description.toLowerCase().includes(debouncedSearch.toLowerCase());
@@ -137,7 +131,7 @@ export default function MenuPage() {
             padding: "3rem 1.5rem",
           }}
         >
-          {/* Search */}
+          {/* Search with Clear Button */}
           <div
             style={{
               position: "relative",
@@ -161,7 +155,7 @@ export default function MenuPage() {
               placeholder="Search dishes..."
               style={{
                 width: "100%",
-                padding: "0.75rem 1rem 0.75rem 2.6rem",
+                padding: "0.75rem 2.6rem", // Adjust for icons on both sides
                 background: "var(--surface)",
                 border: "1px solid var(--border)",
                 color: "var(--cream)",
@@ -171,6 +165,21 @@ export default function MenuPage() {
               onFocus={(e) => (e.target.style.borderColor = "var(--gold-dim)")}
               onBlur={(e) => (e.target.style.borderColor = "var(--border)")}
             />
+            {/* Clear Button logic */}
+            {searchInput && (
+              <X
+                size={16}
+                onClick={() => setSearchInput("")}
+                style={{
+                  position: "absolute",
+                  right: "14px",
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  color: "var(--muted)",
+                  cursor: "pointer",
+                }}
+              />
+            )}
           </div>
 
           {/* Category Tabs */}
@@ -231,31 +240,43 @@ export default function MenuPage() {
               : ""}
           </p>
 
-          {/* Items Grid */}
-          {filtered.length === 0 ? (
-            <div
-              style={{
-                textAlign: "center",
-                color: "var(--muted)",
-                padding: "4rem 0",
-              }}
-            >
-              <p style={{ fontSize: "2rem", marginBottom: "1rem" }}>✦</p>
-              <p>No items found.</p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 min-[600px]:grid-cols-2 md:grid-cols-3 gap-6">
-              {filtered.map((item, i) => (
-                <div
-                  key={item.id}
-                  className="fade-up"
-                  style={{ animationDelay: `${i * 0.04}s`, opacity: 0 }}
+          {/* Items Grid with Animation */}
+          <motion.div
+            layout // Smooth transition for items moving
+            className="grid grid-cols-1 min-[600px]:grid-cols-2 md:grid-cols-3 gap-6"
+          >
+            <AnimatePresence mode="popLayout">
+              {filtered.length === 0 ? (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  style={{
+                    gridColumn: "1 / -1",
+                    textAlign: "center",
+                    color: "var(--muted)",
+                    padding: "4rem 0",
+                  }}
                 >
-                  <MenuCard item={item} />
-                </div>
-              ))}
-            </div>
-          )}
+                  <p style={{ fontSize: "2rem", marginBottom: "1rem" }}>✦</p>
+                  <p>No items found.</p>
+                </motion.div>
+              ) : (
+                filtered.map((item) => (
+                  <motion.div
+                    key={item.id}
+                    layout
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.9 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <MenuCard item={item} />
+                  </motion.div>
+                ))
+              )}
+            </AnimatePresence>
+          </motion.div>
         </div>
       </div>
     </>

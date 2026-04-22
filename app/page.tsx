@@ -1,9 +1,16 @@
 "use client";
 
 import Link from "next/link";
+import { motion } from "framer-motion";
 import Navbar from "@/components/Navbar";
 
 export default function HomePage() {
+  const fadeInUp = {
+    initial: { opacity: 0, y: 30 },
+    animate: { opacity: 1, y: 0 },
+    transition: { duration: 0.8, ease: "easeOut" },
+  };
+
   return (
     <>
       <Navbar />
@@ -20,7 +27,7 @@ export default function HomePage() {
           padding: "0 1.5rem",
           position: "relative",
           overflow: "hidden",
-          background: "#050505",
+          background: "var(--bg)", // Added variable background
         }}
       >
         {/* Decorative background gradient */}
@@ -47,8 +54,14 @@ export default function HomePage() {
           }}
         >
           {/* Est. 2026 Header */}
-          <div
-            className="fade-up"
+          <motion.div
+            {...{
+              ...fadeInUp,
+              transition: {
+                ...fadeInUp.transition,
+                ease: [0.4, 0, 0.2, 1],
+              },
+            }}
             style={{
               display: "flex",
               alignItems: "center",
@@ -83,11 +96,12 @@ export default function HomePage() {
                 background: "var(--gold-dim)",
               }}
             />
-          </div>
+          </motion.div>
 
           {/* Main Title */}
-          <h1
-            className="fade-up fade-up-delay-1"
+          <motion.h1
+            {...fadeInUp}
+            transition={{ delay: 0.2, duration: 0.8 }}
             style={{
               fontFamily: "Cormorant Garamond, serif",
               fontSize: "clamp(3rem, 9vw, 6.5rem)",
@@ -102,11 +116,12 @@ export default function HomePage() {
             <em style={{ color: "var(--gold)", fontStyle: "italic" }}>
               Restaurant
             </em>
-          </h1>
+          </motion.h1>
 
           {/* Subtitle */}
-          <p
-            className="fade-up fade-up-delay-2"
+          <motion.p
+            {...fadeInUp}
+            transition={{ delay: 0.4, duration: 0.8 }}
             style={{
               color: "var(--muted)",
               fontSize: "clamp(0.9rem, 2vw, 1rem)",
@@ -118,11 +133,12 @@ export default function HomePage() {
           >
             An exquisite culinary journey through refined flavours, crafted with
             passion and served with grace.
-          </p>
+          </motion.p>
 
           {/* Action Buttons */}
-          <div
-            className="fade-up fade-up-delay-3"
+          <motion.div
+            {...fadeInUp}
+            transition={{ delay: 0.6, duration: 0.8 }}
             style={{
               display: "flex",
               gap: "1.2rem",
@@ -136,7 +152,7 @@ export default function HomePage() {
               style={{
                 padding: "1rem 2.6rem",
                 background: "var(--gold)",
-                color: "#0A0A0A",
+                color: "var(--bg)", // Changed from #0A0A0A to adapt
                 textDecoration: "none",
                 fontSize: "0.75rem",
                 letterSpacing: "0.18em",
@@ -163,7 +179,7 @@ export default function HomePage() {
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.borderColor = "var(--gold-dim)";
-                e.currentTarget.style.background = "rgba(255,255,255,0.02)";
+                e.currentTarget.style.background = "var(--surface)";
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.borderColor = "var(--border)";
@@ -172,7 +188,7 @@ export default function HomePage() {
             >
               Reserve a Table
             </Link>
-          </div>
+          </motion.div>
         </div>
       </section>
 
@@ -182,7 +198,7 @@ export default function HomePage() {
           borderTop: "1px solid var(--border)",
           borderBottom: "1px solid var(--border)",
           padding: "5rem 2rem",
-          background: "#0D0D0D",
+          background: "var(--surface)", // Changed from #0D0D0D
         }}
       >
         <div
@@ -229,9 +245,7 @@ export default function HomePage() {
       </section>
 
       {/* --- FOOTER --- */}
-      <footer
-        style={{ padding: "4rem", textAlign: "center", background: "#050505" }}
-      >
+      <footer style={{ padding: "4rem", textAlign: "center" }}>
         <p
           style={{
             color: "var(--muted)",

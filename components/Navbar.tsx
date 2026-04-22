@@ -11,12 +11,16 @@ import {
   LayoutDashboard,
   LogIn,
   LogOut,
-} from "lucide-react"; // Pro icons
+  Sun,
+  Moon,
+} from "lucide-react";
 import { useSession, signOut } from "next-auth/react";
+import { useTheme } from "@/context/ThemeContext";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
   const { data: session, status } = useSession();
+  const { theme, toggle } = useTheme();
 
   const isLoading = status === "loading";
   const isAdmin = session?.user?.email
@@ -35,11 +39,14 @@ export default function Navbar() {
     return () => window.removeEventListener("click", handleOutsideClick);
   }, [open]);
 
-  // Links data with Icons
   const navLinks = [
     { name: "Menu", href: "/menu", icon: <UtensilsCrossed size={16} /> },
     { name: "About", href: "/about", icon: <Info size={16} /> },
-    { name: "Reservations", href: "/reservations", icon: <CalendarDays size={16} /> },
+    {
+      name: "Reservations",
+      href: "/reservations",
+      icon: <CalendarDays size={16} />,
+    },
   ];
 
   const desktopButtonStyle = {
@@ -69,7 +76,7 @@ export default function Navbar() {
           right: 0,
           zIndex: 100,
           borderBottom: "1px solid var(--border)",
-          background: "rgba(10,10,10,0.95)",
+          background: "var(--nav-bg)",
           backdropFilter: "blur(12px)",
           padding: "0 2rem",
           height: "72px",
@@ -146,6 +153,41 @@ export default function Navbar() {
             </Link>
           )}
 
+          {/* Theme Toggle */}
+          <button
+            onClick={toggle}
+            aria-label="Toggle theme"
+            style={{
+              background: "none",
+              border: "1px solid var(--border)",
+              color: "var(--muted)",
+              cursor: "pointer",
+              width: "36px",
+              height: "36px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              transition: "border-color 0.2s, color 0.2s",
+              flexShrink: 0,
+            }}
+            onMouseEnter={(e) => {
+              (e.currentTarget as HTMLElement).style.borderColor =
+                "var(--gold-dim)";
+              (e.currentTarget as HTMLElement).style.color = "var(--gold)";
+            }}
+            onMouseLeave={(e) => {
+              (e.currentTarget as HTMLElement).style.borderColor =
+                "var(--border)";
+              (e.currentTarget as HTMLElement).style.color = "var(--muted)";
+            }}
+          >
+            {theme === "dark" ? (
+              <Sun size={15} strokeWidth={1.5} />
+            ) : (
+              <Moon size={15} strokeWidth={1.5} />
+            )}
+          </button>
+
           {!isLoading &&
             (session ? (
               <button onClick={() => signOut()} style={desktopButtonStyle}>
@@ -195,14 +237,14 @@ export default function Navbar() {
               top: "72px",
               left: 0,
               right: 0,
-              background: "#0F0F0F",
+              background: "var(--mobile-bg)",
               borderBottom: "1px solid var(--border)",
               padding: "2rem",
               display: "flex",
               flexDirection: "column",
               gap: "1.8rem",
               zIndex: 95,
-              boxShadow: "0 10px 30px rgba(0,0,0,0.5)",
+              boxShadow: "0 10px 30px rgba(0,0,0,0.3)",
             }}
           >
             {navLinks.map((link) => (
@@ -233,6 +275,26 @@ export default function Navbar() {
                 margin: "0.5rem 0",
               }}
             />
+
+            <div className="lg:hidden flex items-center gap-3">
+              <button
+                onClick={toggle}
+                aria-label="Toggle theme"
+                style={{
+                  background: "none",
+                  border: "1px solid var(--border)",
+                  color: "var(--muted)",
+                  cursor: "pointer",
+                  width: "36px",
+                  height: "36px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                {theme === "dark" ? <Sun size={15} /> : <Moon size={15} />}
+              </button>
+            </div>
 
             {!isLoading && isAdmin && (
               <Link

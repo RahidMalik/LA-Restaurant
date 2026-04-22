@@ -1,7 +1,10 @@
 @import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap");
+
 @import "tailwindcss";
 
-:root {
+/* ── DARK THEME (default) ─────────────────────────────── */
+:root,
+[data-theme="dark"] {
   --bg: #0a0a0a;
   --surface: #141414;
   --border: #222222;
@@ -10,6 +13,22 @@
   --cream: #f2ead8;
   --muted: #6b6b6b;
   --danger: #c0392b;
+  --nav-bg: rgba(10, 10, 10, 0.92);
+  --mobile-bg: #0f0f0f;
+}
+
+/* ── LIGHT THEME ──────────────────────────────────────── */
+[data-theme="light"] {
+  --bg: #f5f0e8;
+  --surface: #edeae0;
+  --border: #d4cebf;
+  --gold: #9a6f3a;
+  --gold-dim: #b8935a;
+  --cream: #1a1714;
+  --muted: #7a7060;
+  --danger: #c0392b;
+  --nav-bg: rgba(245, 240, 232, 0.95);
+  --mobile-bg: #ede8df;
 }
 
 * {
@@ -29,6 +48,9 @@ body {
   font-weight: 300;
   letter-spacing: 0.01em;
   -webkit-font-smoothing: antialiased;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
 }
 
 h1,
@@ -37,7 +59,7 @@ h3 {
   font-family: "Cormorant Garamond", serif;
 }
 
-/* Scrollbar */
+/* ── Scrollbar ───────────────────────────────────────── */
 ::-webkit-scrollbar {
   width: 4px;
 }
@@ -49,7 +71,7 @@ h3 {
   border-radius: 2px;
 }
 
-/* Gold divider */
+/* ── Gold divider ────────────────────────────────────── */
 .gold-line {
   width: 48px;
   height: 1px;
@@ -57,7 +79,7 @@ h3 {
   display: block;
 }
 
-/* Shine animation on cards */
+/* ── Shimmer ─────────────────────────────────────────── */
 @keyframes shimmer {
   0% {
     background-position: -200% center;
@@ -66,7 +88,6 @@ h3 {
     background-position: 200% center;
   }
 }
-
 .shimmer {
   background: linear-gradient(
     90deg,
@@ -78,7 +99,7 @@ h3 {
   animation: shimmer 3s linear infinite;
 }
 
-/* Fade in */
+/* ── Fade in ─────────────────────────────────────────── */
 @keyframes fadeUp {
   from {
     opacity: 0;
@@ -89,11 +110,9 @@ h3 {
     transform: translateY(0);
   }
 }
-
 .fade-up {
   animation: fadeUp 0.6s ease forwards;
 }
-
 .fade-up-delay-1 {
   animation-delay: 0.1s;
   opacity: 0;
