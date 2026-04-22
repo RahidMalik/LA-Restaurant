@@ -44,3 +44,29 @@ model User {
   accounts      Account[]
   sessions      Session[]
 }
+
+// Category method
+model Category {
+  id        String     @id @default(cuid())
+  name      String     @unique
+  items     MenuItem[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+model MenuItem {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  price       Float
+  image       String?
+  isAvailable Boolean  @default(true)
+  isFeatured  Boolean  @default(false)
+  
+  // Category relation
+  category    Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  categoryId  String
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}

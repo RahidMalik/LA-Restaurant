@@ -1,20 +1,21 @@
-export interface MenuItem {
+export type MenuItem = {
   id: string;
   name: string;
-  description: string;
+  description?: string | null;
   price: number;
-  category: string;
-  image_url: string;
-  is_available: boolean;
-  is_featured: boolean;
-  created_at: string;
-}
+  image?: string | null;
+  isAvailable: boolean;
+  isFeatured: boolean;
+  categoryId: string;
+  createdAt: Date;
+  updatedAt: Date;
+};
 
 export interface Category {
   id: string;
   name: string;
-  slug: string;
-  icon: string;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface Restaurant {

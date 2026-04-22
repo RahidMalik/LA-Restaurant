@@ -4,30 +4,26 @@ import { useEffect, useState } from "react";
 import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import type { MenuItem } from "@/types";
-import {
-  getAllMenuItems,
-  addMenuItem,
-  deleteMenuItem,
-  toggleItemAvailability,
-  toggleFeatured,
-  uploadItemImage,
-} from "@/lib/api";
+import { menuApi, categoryApi } from "@/services/api";
 import { Plus, Trash2, Eye, EyeOff, Star, LogOut } from "lucide-react";
 
 const EMPTY_FORM = {
   name: "",
   description: "",
   price: 0,
-  category: "mains",
-  image_url: "",
-  is_available: true,
-  is_featured: false,
+  categoryId: "",
+  image: "",
+  isAvailable: true,
+  isFeatured: false,
 };
 
 export default function AdminPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [items, setItems] = useState<MenuItem[]>([]);
+  const [categories, setCategories] = useState<{ id: string; name: string }[]>(
+    [],
+  );
   const [form, setForm] = useState(EMPTY_FORM);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
@@ -43,13 +39,43 @@ export default function AdminPage() {
   }, [status, isAdmin, router]);
 
   useEffect(() => {
-    if (status === "authenticated" && isAdmin) loadItems();
+    if (status === "authenticated" && isAdmin) {
+      loadItems();
+      loadCategories();
+    }
   }, [status, isAdmin]);
 
   async function loadItems() {
     try {
-      setItems(await getAllMenuItems());
-    } catch {}
+      const data = await menuApi.getAll();
+      setItems(Array.isArray(data) ? data : []);
+    } catch (err) {
+      console.error("Failed to load items:", err);
+      setItems([]);
+    }
+  }
+
+  async function loadCategories() {
+    try {
+      const data = await categoryApi.getAll();
+      setCategories(Array.isArray(data) ? data : []);
+    } catch (err) {
+      console.error("Failed to load categories:", err);
+      setCategories([]);
+    }
+  }
+  async function uploadImage(file: File): Promise<string> {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const response = await fetch("/api/upload", {
+      method: "POST",
+      body: formData,
+    });
+
+    if (!response.ok) throw new Error("Image upload failed");
+    const data = await response.json();
+    return data.url;
   }
 
   async function handleAdd(e: React.FormEvent) {
@@ -57,9 +83,22 @@ export default function AdminPage() {
     setLoading(true);
     setMsg("");
     try {
-      let imageUrl = form.image_url;
-      if (imageFile) imageUrl = await uploadItemImage(imageFile, form.name);
-      await addMenuItem({ ...form, image_url: imageUrl });
+      let imageUrl = form.image;
+
+      if (imageFile) {
+        imageUrl = await uploadImage(imageFile);
+      }
+
+      await menuApi.create({
+        name: form.name,
+        description: form.description || null,
+        price: form.price,
+        categoryId: form.categoryId,
+        image: imageUrl || null,
+        isAvailable: form.isAvailable,
+        isFeatured: form.isFeatured,
+      });
+
       setForm(EMPTY_FORM);
       setImageFile(null);
       setMsg("✓ Item added successfully");
@@ -73,8 +112,30 @@ export default function AdminPage() {
 
   async function handleDelete(id: string, name: string) {
     if (!confirm(`Delete "${name}"?`)) return;
-    await deleteMenuItem(id);
-    loadItems();
+    try {
+      await menuApi.delete(id);
+      loadItems();
+    } catch (err: any) {
+      setMsg("Error: " + err.message);
+    }
+  }
+
+  async function toggleAvailability(id: string, isAvailable: boolean) {
+    try {
+      await menuApi.update(id, { isAvailable });
+      loadItems();
+    } catch (err: any) {
+      setMsg("Error: " + err.message);
+    }
+  }
+
+  async function toggleFeatured(id: string, isFeatured: boolean) {
+    try {
+      await menuApi.update(id, { isFeatured });
+      loadItems();
+    } catch (err: any) {
+      setMsg("Error: " + err.message);
+    }
   }
 
   // ── Loading / redirecting ─────────────────────────────
@@ -184,25 +245,27 @@ export default function AdminPage() {
               style={inputStyle}
             />
             <select
-              value={form.category}
-              onChange={(e) => setForm({ ...form, category: e.target.value })}
+              value={form.categoryId}
+              onChange={(e) => setForm({ ...form, categoryId: e.target.value })}
+              required
               style={{ ...inputStyle, cursor: "pointer" }}
             >
-              {["starters", "mains", "desserts", "drinks", "sides"].map((c) => (
-                <option key={c} value={c}>
-                  {c.charAt(0).toUpperCase() + c.slice(1)}
+              <option value="">Select Category *</option>
+              {categories?.map((cat) => (
+                <option key={cat.id} value={cat.id}>
+                  {cat.name}
                 </option>
               ))}
             </select>
             <input
               placeholder="Image URL (optional)"
-              value={form.image_url}
-              onChange={(e) => setForm({ ...form, image_url: e.target.value })}
+              value={form.image}
+              onChange={(e) => setForm({ ...form, image: e.target.value })}
               style={inputStyle}
             />
             <textarea
               placeholder="Description *"
-              value={form.description}
+              value={form.description || ""}
               onChange={(e) =>
                 setForm({ ...form, description: e.target.value })
               }
@@ -252,9 +315,9 @@ export default function AdminPage() {
               >
                 <input
                   type="checkbox"
-                  checked={form.is_available}
+                  checked={form.isAvailable}
                   onChange={(e) =>
-                    setForm({ ...form, is_available: e.target.checked })
+                    setForm({ ...form, isAvailable: e.target.checked })
                   }
                 />
                 Available
@@ -271,9 +334,9 @@ export default function AdminPage() {
               >
                 <input
                   type="checkbox"
-                  checked={form.is_featured}
+                  checked={form.isFeatured}
                   onChange={(e) =>
-                    setForm({ ...form, is_featured: e.target.checked })
+                    setForm({ ...form, isFeatured: e.target.checked })
                   }
                 />
                 Chef's Pick
@@ -338,9 +401,9 @@ export default function AdminPage() {
                   flexWrap: "wrap",
                 }}
               >
-                {item.image_url && (
+                {item.image && (
                   <img
-                    src={item.image_url}
+                    src={item.image}
                     alt={item.name}
                     style={{
                       width: "60px",
@@ -364,37 +427,30 @@ export default function AdminPage() {
                     style={{
                       color: "var(--muted)",
                       fontSize: "0.75rem",
-                      textTransform: "capitalize",
                     }}
                   >
-                    {item.category} · Rs. {item.price.toLocaleString()}
+                    Rs. {item.price.toLocaleString()}
                   </p>
                 </div>
                 <div style={{ display: "flex", gap: "0.6rem" }}>
                   <button
                     onClick={() =>
-                      toggleItemAvailability(item.id, !item.is_available).then(
-                        loadItems,
-                      )
+                      toggleAvailability(item.id, !item.isAvailable)
                     }
-                    title={item.is_available ? "Hide" : "Show"}
                     style={iconBtnStyle(
-                      item.is_available ? "var(--gold)" : "var(--muted)",
+                      item.isAvailable ? "var(--gold)" : "var(--muted)",
                     )}
                   >
-                    {item.is_available ? (
+                    {item.isAvailable ? (
                       <Eye size={15} />
                     ) : (
                       <EyeOff size={15} />
                     )}
                   </button>
                   <button
-                    onClick={() =>
-                      toggleFeatured(item.id, !item.is_featured).then(loadItems)
-                    }
-                    title="Toggle Featured"
+                    onClick={() => toggleFeatured(item.id, !item.isFeatured)}
                     style={iconBtnStyle(
-                      item.is_featured ? "var(--gold)" : "var(--muted)",
+                      item.isFeatured ? "var(--gold)" : "var(--muted)",
                     )}
                   >
                     <Star size={15} />
