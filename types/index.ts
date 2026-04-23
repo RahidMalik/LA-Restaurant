@@ -16,8 +16,8 @@ export interface Category {
   name: string;
   slug: string;
   icon: string
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 export interface Restaurant {
