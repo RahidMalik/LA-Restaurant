@@ -72,10 +72,10 @@ export default function MenuPage() {
 
   const filtered = useMemo(() => {
     return items.filter((item) => {
-      const matchCat = active === "all" || item.category === active;
+      const matchCat = active === "all" || item.categoryId === active;
       const matchSearch =
         item.name.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
-        item.description.toLowerCase().includes(debouncedSearch.toLowerCase());
+        item.description?.toLowerCase().includes(debouncedSearch.toLowerCase());
       return matchCat && matchSearch;
     });
   }, [items, active, debouncedSearch]);
@@ -155,7 +155,7 @@ export default function MenuPage() {
               placeholder="Search dishes..."
               style={{
                 width: "100%",
-                padding: "0.75rem 2.6rem", // Adjust for icons on both sides
+                padding: "0.75rem 2.6rem",
                 background: "var(--surface)",
                 border: "1px solid var(--border)",
                 color: "var(--cream)",
