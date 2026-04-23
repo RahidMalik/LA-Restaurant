@@ -1,4 +1,5 @@
-import axios, { type AxiosInstance, AxiosError } from "axios";
+import axios from "axios";
+import type { AxiosInstance, AxiosError } from "axios";
 
 export class ApiClient {
     protected readonly axiosInstance: AxiosInstance;
