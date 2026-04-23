@@ -1,5 +1,7 @@
 "use client";
-import { useState } from "react";
+export const dynamic = "force-dynamic";
+
+import { useState, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
@@ -7,7 +9,8 @@ import { Eye, EyeOff } from "lucide-react";
 import { motion } from "framer-motion";
 import Navbar from "@/components/Navbar";
 
-export default function LoginPage() {
+// LoginForm component jo URL params read karta hai
+function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -58,6 +61,91 @@ export default function LoginPage() {
 
   return (
     <>
+      {successMsg && (
+        <p
+          style={{
+            color: "#4BB543",
+            fontSize: "0.8rem",
+            marginBottom: "1rem",
+          }}
+        >
+          {successMsg}
+        </p>
+      )}
+
+      <motion.button
+        whileHover={{ background: "rgba(255,255,255,0.05)" }}
+        onClick={handleGoogleLogin}
+        style={googleButtonStyle}
+      >
+        <img
+          src="https://authjs.dev/img/providers/google.svg"
+          width="18"
+          style={{ marginRight: "10px" }}
+          alt="Google Logo"
+        />
+        Continue with Google
+      </motion.button>
+
+      <div style={dividerContainer}>
+        <div style={dividerLine}></div>
+        <span style={dividerText}>or</span>
+        <div style={dividerLine}></div>
+      </div>
+
+      <form onSubmit={handleLogin} style={formStyle}>
+        <div style={inputGroupStyle}>
+          <label style={labelStyle}>Email Address</label>
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            style={inputStyle}
+            placeholder="Enter your email"
+            required
+          />
+        </div>
+
+        <div style={inputGroupStyle}>
+          <label style={labelStyle}>Password</label>
+          <div style={passwordWrapper}>
+            <input
+              type={showPassword ? "text" : "password"}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              style={{ ...inputStyle, width: "100%" }}
+              placeholder="Enter your password"
+              required
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              style={eyeButtonStyle}
+            >
+              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
+          </div>
+        </div>
+
+        {error && <p style={errorStyle}>{error}</p>}
+
+        <motion.button
+          whileHover={{ scale: 1.02 }}
+          type="submit"
+          disabled={loading}
+          style={buttonStyle}
+        >
+          {loading ? "Authenticating..." : "Login"}
+        </motion.button>
+      </form>
+    </>
+  );
+}
+
+// Main Page Component jo Suspense provide karta hai
+export default function LoginPage() {
+  return (
+    <>
       <Navbar />
       <div style={containerStyle}>
         <motion.div
@@ -70,83 +158,15 @@ export default function LoginPage() {
           </h1>
           <p style={subtitleStyle}>Login to your account</p>
 
-          {successMsg && (
-            <p
-              style={{
-                color: "#4BB543",
-                fontSize: "0.8rem",
-                marginBottom: "1rem",
-              }}
-            >
-              {successMsg}
-            </p>
-          )}
-
-          <motion.button
-            whileHover={{ background: "rgba(255,255,255,0.05)" }}
-            onClick={handleGoogleLogin}
-            style={googleButtonStyle}
+          <Suspense
+            fallback={
+              <p style={{ color: "var(--muted)", fontSize: "0.8rem" }}>
+                Loading...
+              </p>
+            }
           >
-            <img
-              src="https://authjs.dev/img/providers/google.svg"
-              width="18"
-              style={{ marginRight: "10px" }}
-              alt="Google Logo"
-            />
-            Continue with Google
-          </motion.button>
-
-          <div style={dividerContainer}>
-            <div style={dividerLine}></div>
-            <span style={dividerText}>or</span>
-            <div style={dividerLine}></div>
-          </div>
-
-          <form onSubmit={handleLogin} style={formStyle}>
-            <div style={inputGroupStyle}>
-              <label style={labelStyle}>Email Address</label>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                style={inputStyle}
-                placeholder="Enter your email"
-                required
-              />
-            </div>
-
-            <div style={inputGroupStyle}>
-              <label style={labelStyle}>Password</label>
-              <div style={passwordWrapper}>
-                <input
-                  type={showPassword ? "text" : "password"}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  style={{ ...inputStyle, width: "100%" }}
-                  placeholder="Enter your password"
-                  required
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  style={eyeButtonStyle}
-                >
-                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                </button>
-              </div>
-            </div>
-
-            {error && <p style={errorStyle}>{error}</p>}
-
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              type="submit"
-              disabled={loading}
-              style={buttonStyle}
-            >
-              {loading ? "Authenticating..." : "Login"}
-            </motion.button>
-          </form>
+            <LoginForm />
+          </Suspense>
 
           <p style={footerTextStyle}>
             Don't have an account?{" "}
@@ -163,8 +183,7 @@ export default function LoginPage() {
   );
 }
 
-// Copy the same style objects from Signup Page here
-// containerStyle, glassCardStyle, titleStyle, subtitleStyle, etc.
+// Styles Objects (No changes)
 const containerStyle: React.CSSProperties = {
   minHeight: "100vh",
   backgroundColor: "var(--bg)",
@@ -278,7 +297,7 @@ const buttonStyle: React.CSSProperties = {
   color: "var(--bg)",
   border: "none",
   textTransform: "uppercase",
-  fontWeight: "600",
+  fontWeight: "600", // Fixed: number needs to be string if wrapped in quotes, or just 600
   letterSpacing: "0.2em",
   fontSize: "0.8rem",
   cursor: "pointer",
