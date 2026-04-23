@@ -29,7 +29,7 @@ export default function MenuCard({ item }: MenuCardProps) {
       }}
     >
       {/* Image Section */}
-      {item.image_url && (
+      {item.image && (
         <div
           style={{
             width: "100%",
@@ -40,7 +40,7 @@ export default function MenuCard({ item }: MenuCardProps) {
           }}
         >
           <img
-            src={item.image_url}
+            src={item.image}
             alt={item.name}
             style={{
               width: "100%",
@@ -53,7 +53,7 @@ export default function MenuCard({ item }: MenuCardProps) {
             }
             onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
           />
-          {item.is_featured && (
+          {item.isFeatured && (
             <span
               style={{
                 position: "absolute",
